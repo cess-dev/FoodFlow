@@ -14,15 +14,16 @@ import java.util.List;
 public class ItemDAO {
 
     public boolean addItem(Item item) {
-        String sql = "INSERT INTO items (name, category, stock, unit_of_measure, description, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO items (name, category, item_type, stock, unit_of_measure, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, item.getName());
             stmt.setString(2, item.getCategory());
-            stmt.setDouble(3, item.getCurrentStock());
-            stmt.setString(4, item.getUnitOfMeasure());
-            stmt.setString(5, item.getDescription());
-            stmt.setString(6, normalizeStatus(item.getStatus(), item.getCurrentStock()));
+            stmt.setString(3, item.getItemType() == null ? "FOOD" : item.getItemType().toUpperCase());
+            stmt.setDouble(4, item.getCurrentStock());
+            stmt.setString(5, item.getUnitOfMeasure());
+            stmt.setString(6, item.getDescription());
+            stmt.setString(7, normalizeStatus(item.getStatus(), item.getCurrentStock()));
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -82,24 +83,6 @@ public class ItemDAO {
         return items;
     }
 
-    public boolean updateItem(Item item) {
-        String sql = "UPDATE items SET name=?, category=?, stock=?, unit_of_measure=?, description=?, status=? WHERE item_id=?";
-        try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, item.getName());
-            stmt.setString(2, item.getCategory());
-            stmt.setDouble(3, item.getCurrentStock());
-            stmt.setString(4, item.getUnitOfMeasure());
-            stmt.setString(5, item.getDescription());
-            stmt.setString(6, normalizeStatus(item.getStatus(), item.getCurrentStock()));
-            stmt.setInt(7, item.getItemId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean updateItemStatus(int itemId, double currentStock, String status) {
         String sql = "UPDATE items SET stock = ?, status = ? WHERE item_id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -114,29 +97,18 @@ public class ItemDAO {
         return false;
     }
 
-    public boolean adjustStock(int itemId, double delta) {
-        Item item = getItemById(itemId);
-        if (item == null) {
-            return false;
-        }
-        double newStock = item.getCurrentStock() + delta;
-        if (newStock < 0) {
-            return false;
-        }
-        return updateItemStatus(itemId, newStock, item.getStatus());
-    }
-
     private String normalizeStatus(String requestedStatus, double stock) {
         if (stock <= 0) {
             return "OUT_OF_STOCK";
         }
-        if ("LOW_STOCK".equalsIgnoreCase(requestedStatus) || stock <= 10) {
-            return "LOW_STOCK";
-        }
         if (requestedStatus == null || requestedStatus.isBlank()) {
             return "AVAILABLE";
         }
-        return requestedStatus.toUpperCase();
+        String normalized = requestedStatus.toUpperCase();
+        if ("DAMAGED".equals(normalized) || "INACTIVE".equals(normalized) || "AVAILABLE".equals(normalized) || "OUT_OF_STOCK".equals(normalized)) {
+            return normalized;
+        }
+        return "AVAILABLE";
     }
 
     private Item mapResultSetToItem(ResultSet rs) throws SQLException {
@@ -144,6 +116,7 @@ public class ItemDAO {
         item.setItemId(rs.getInt("item_id"));
         item.setName(rs.getString("name"));
         item.setCategory(rs.getString("category"));
+        item.setItemType(rs.getString("item_type"));
         item.setCurrentStock(rs.getDouble("stock"));
         item.setUnitOfMeasure(rs.getString("unit_of_measure"));
         item.setDescription(rs.getString("description"));

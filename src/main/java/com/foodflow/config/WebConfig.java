@@ -1,9 +1,7 @@
 package com.foodflow.config;
 
-import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class WebConfig {
 
@@ -38,32 +36,4 @@ public class WebConfig {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     }
 
-    /**
-     * Example Filter class for applying configs automatically
-     */
-    public static class AppFilter implements Filter {
-
-        @Override
-        public void init(FilterConfig filterConfig) {}
-
-        @Override
-        public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
-                throws IOException, ServletException {
-
-            HttpServletRequest request = (HttpServletRequest) servletRequest;
-            HttpServletResponse response = (HttpServletResponse) servletResponse;
-
-            configureRequest(request);
-            configureResponse(response);
-            // enableCORS(response); // Uncomment if needed for separate frontend
-
-            // Set session timeout
-            request.getSession().setMaxInactiveInterval(SESSION_TIMEOUT_MINUTES * 60);
-
-            chain.doFilter(servletRequest, servletResponse);
-        }
-
-        @Override
-        public void destroy() {}
-    }
 }

@@ -9,7 +9,7 @@ public class Supply {
     private String itemName;
     private double quantity;
     private String supplier;
-    private int recordedBy;
+    private Integer recordedBy;
     private String recordedByName;
     private LocalDate date = LocalDate.now();
     private LocalTime time = LocalTime.now();
@@ -29,8 +29,8 @@ public class Supply {
     public String getSupplier() { return supplier; }
     public void setSupplier(String supplier) { this.supplier = supplier; }
 
-    public int getRecordedBy() { return recordedBy; }
-    public void setRecordedBy(int recordedBy) { this.recordedBy = recordedBy; }
+    public Integer getRecordedBy() { return recordedBy; }
+    public void setRecordedBy(Integer recordedBy) { this.recordedBy = recordedBy; }
 
     public String getRecordedByName() { return recordedByName; }
     public void setRecordedByName(String recordedByName) { this.recordedByName = recordedByName; }

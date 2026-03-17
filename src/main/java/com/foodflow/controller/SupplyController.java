@@ -4,6 +4,7 @@ import com.foodflow.config.SecurityConfig;
 import com.foodflow.dao.ItemDAO;
 import com.foodflow.dao.SupplyDAO;
 import com.foodflow.model.User;
+import com.foodflow.service.SupplyService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ public class SupplyController extends HttpServlet {
 
     private final SupplyDAO supplyDAO = new SupplyDAO();
     private final ItemDAO itemDAO = new ItemDAO();
+    private final SupplyService supplyService = new SupplyService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -56,7 +58,7 @@ public class SupplyController extends HttpServlet {
 
         try {
             int quantity = Integer.parseInt(quantityStr);
-            supplyDAO.addSupply(itemId, quantity, user.getUserId());
+            supplyService.recordSupply(Integer.parseInt(itemId), quantity, user.getUserId());
             response.sendRedirect("supplies");
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid quantity");

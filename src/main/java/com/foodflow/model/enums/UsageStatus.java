@@ -1,6 +1,8 @@
 package com.foodflow.model.enums;
 
 public enum UsageStatus {
-    ISSUED,
-    RETURNED
+    BORROWED,
+    PARTIALLY_RETURNED,
+    RETURNED,
+    LOST
 }

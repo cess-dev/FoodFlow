@@ -17,7 +17,7 @@ public class SupplyDAO {
 
     public boolean addSupply(Supply supply) {
         String insertSql = "INSERT INTO supply (item_id, quantity, supplier, supply_date, recorded_by) VALUES (?, ?, ?, ?, ?)";
-        String stockSql = "UPDATE items SET stock = stock + ?, status = CASE WHEN stock + ? <= 0 THEN 'OUT_OF_STOCK' WHEN stock + ? <= 10 THEN 'LOW_STOCK' ELSE 'AVAILABLE' END WHERE item_id = ?";
+        String stockSql = "UPDATE items SET stock = stock + ?, status = CASE WHEN stock + ? <= 0 THEN 'OUT_OF_STOCK' ELSE 'AVAILABLE' END WHERE item_id = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement insertStmt = conn.prepareStatement(insertSql);
              PreparedStatement stockStmt = conn.prepareStatement(stockSql)) {
@@ -26,13 +26,16 @@ public class SupplyDAO {
             insertStmt.setDouble(2, supply.getQuantity());
             insertStmt.setString(3, supply.getSupplier());
             insertStmt.setTimestamp(4, Timestamp.valueOf(LocalDateTime.of(supply.getDate(), supply.getTime())));
-            insertStmt.setInt(5, supply.getRecordedBy());
+            if (supply.getRecordedBy() == null || supply.getRecordedBy() <= 0) {
+                insertStmt.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                insertStmt.setInt(5, supply.getRecordedBy());
+            }
             insertStmt.executeUpdate();
 
             stockStmt.setDouble(1, supply.getQuantity());
             stockStmt.setDouble(2, supply.getQuantity());
-            stockStmt.setDouble(3, supply.getQuantity());
-            stockStmt.setInt(4, supply.getItemId());
+            stockStmt.setInt(3, supply.getItemId());
             stockStmt.executeUpdate();
 
             conn.commit();
@@ -46,7 +49,7 @@ public class SupplyDAO {
     public List<Supply> getAllSupplies() {
         String sql = "SELECT s.*, i.name AS item_name, u.name AS recorded_by_name " +
                 "FROM supply s JOIN items i ON s.item_id = i.item_id " +
-                "JOIN users u ON s.recorded_by = u.user_id ORDER BY s.supply_date DESC";
+                "LEFT JOIN users u ON s.recorded_by = u.user_id ORDER BY s.supply_date DESC";
         List<Supply> supplies = new ArrayList<>();
         try (Connection conn = DatabaseConfig.getConnection();
              Statement stmt = conn.createStatement();
@@ -60,19 +63,6 @@ public class SupplyDAO {
         return supplies;
     }
 
-    public boolean addSupply(String itemId, int quantity, int userId) {
-        try {
-            Supply supply = new Supply();
-            supply.setItemId(Integer.parseInt(itemId));
-            supply.setQuantity(quantity);
-            supply.setSupplier("General Supplier");
-            supply.setRecordedBy(userId);
-            return addSupply(supply);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-    }
-
     private Supply mapResultSetToSupply(ResultSet rs) throws SQLException {
         Supply supply = new Supply();
         supply.setSupplyId(rs.getInt("supply_id"));
@@ -80,7 +70,8 @@ public class SupplyDAO {
         supply.setItemName(rs.getString("item_name"));
         supply.setQuantity(rs.getDouble("quantity"));
         supply.setSupplier(rs.getString("supplier"));
-        supply.setRecordedBy(rs.getInt("recorded_by"));
+        int recordedBy = rs.getInt("recorded_by");
+        supply.setRecordedBy(rs.wasNull() ? null : recordedBy);
         supply.setRecordedByName(rs.getString("recorded_by_name"));
         Timestamp timestamp = rs.getTimestamp("supply_date");
         if (timestamp != null) {

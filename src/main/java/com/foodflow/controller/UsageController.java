@@ -4,6 +4,7 @@ import com.foodflow.config.SecurityConfig;
 import com.foodflow.dao.ItemDAO;
 import com.foodflow.dao.UsageDAO;
 import com.foodflow.model.User;
+import com.foodflow.service.UsageService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ public class UsageController extends HttpServlet {
 
     private final UsageDAO usageDAO = new UsageDAO();
     private final ItemDAO itemDAO = new ItemDAO();
+    private final UsageService usageService = new UsageService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -53,10 +55,11 @@ public class UsageController extends HttpServlet {
 
         String itemId = request.getParameter("itemId");
         String quantityStr = request.getParameter("quantity");
+        String issuedTo = request.getParameter("issuedTo");
 
         try {
             int quantity = Integer.parseInt(quantityStr);
-            usageDAO.recordUsage(itemId, quantity, user.getUserId());
+            usageService.recordUsage(Integer.parseInt(itemId), quantity, user.getUserId(), issuedTo);
             response.sendRedirect("usage");
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid quantity");

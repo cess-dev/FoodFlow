@@ -7,7 +7,7 @@ public class User {
     public enum Role {
         ADMIN,
         DEPARTMENT_HEAD,
-        STORE_KEEPER
+        STOREKEEPER
     }
 
     private int userId;
@@ -15,7 +15,7 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private Role role = Role.STORE_KEEPER;
+    private Role role = Role.STOREKEEPER;
     private boolean active = true;
     private boolean accountLocked;
     private int loginAttempts;
@@ -44,9 +44,9 @@ public class User {
     public void setPassword(String password) { this.password = password; }
 
     public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role == null ? Role.STORE_KEEPER : role; }
+    public void setRole(Role role) { this.role = role == null ? Role.STOREKEEPER : role; }
     public void setRole(com.foodflow.model.enums.Role role) {
-        this.role = role == null ? Role.STORE_KEEPER : Role.valueOf(role.name());
+        this.role = role == null ? Role.STOREKEEPER : Role.valueOf(role.name());
     }
 
     public boolean isActive() { return active; }

@@ -4,6 +4,7 @@ import com.foodflow.config.SecurityConfig;
 import com.foodflow.dao.DamageDAO;
 import com.foodflow.dao.ItemDAO;
 import com.foodflow.model.User;
+import com.foodflow.service.DamageService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ public class DamageController extends HttpServlet {
 
     private final DamageDAO damageDAO = new DamageDAO();
     private final ItemDAO itemDAO = new ItemDAO();
+    private final DamageService damageService = new DamageService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -57,7 +59,7 @@ public class DamageController extends HttpServlet {
 
         try {
             int quantity = Integer.parseInt(quantityStr);
-            damageDAO.recordDamage(itemId, quantity, reason, user.getUserId());
+            damageService.recordDamage(Integer.parseInt(itemId), quantity, reason, user.getUserId());
             response.sendRedirect("damage");
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Invalid quantity");

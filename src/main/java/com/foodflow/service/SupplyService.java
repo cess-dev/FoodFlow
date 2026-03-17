@@ -15,6 +15,7 @@ public class SupplyService {
         supply.setItemId(itemId);
         supply.setQuantity(quantity);
         supply.setSupplier("USER_" + userId);
+        supply.setRecordedBy(userId);
         return supplyDAO.addSupply(supply);
     }
 }

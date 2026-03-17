@@ -118,7 +118,7 @@ public class UserDAO {
     }
 
     public void resetLoginAttempts(int userId) {
-        String sql = "UPDATE users SET status = 'ACTIVE' WHERE user_id = ?";
+        String sql = "INSERT INTO system_logs (user_id, action_performed, timestamp) VALUES (?, 'LOGIN_SUCCESS', CURRENT_TIMESTAMP)";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
@@ -129,7 +129,14 @@ public class UserDAO {
     }
 
     public void incrementLoginAttempts(String username) {
-        // Diagram-driven schema does not persist attempts yet; safe no-op.
+        String sql = "INSERT INTO system_logs (user_id, action_performed, timestamp) VALUES (NULL, ?, CURRENT_TIMESTAMP)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "LOGIN_FAILED [" + username + "]");
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateLastLogin(int userId) {
@@ -151,7 +158,11 @@ public class UserDAO {
         user.setUsername(name);
         user.setEmail(rs.getString("email"));
         user.setPassword(rs.getString("password"));
-        user.setRole(User.Role.valueOf(rs.getString("role")));
+        String role = rs.getString("role");
+        if ("STORE_KEEPER".equalsIgnoreCase(role)) {
+            role = "STOREKEEPER";
+        }
+        user.setRole(User.Role.valueOf(role));
         user.setStatus(rs.getString("status"));
         Timestamp createdAtTs = rs.getTimestamp("created_at");
         LocalDateTime createdAt = createdAtTs == null ? null : createdAtTs.toLocalDateTime();

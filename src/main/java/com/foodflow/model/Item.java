@@ -6,6 +6,7 @@ public class Item {
     private int itemId;
     private String name;
     private String category;
+    private String itemType = "FOOD";
     private double currentStock;
     private String unitOfMeasure;
     private String description;
@@ -19,6 +20,9 @@ public class Item {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getItemType() { return itemType; }
+    public void setItemType(String itemType) { this.itemType = itemType; }
 
     public double getCurrentStock() { return currentStock; }
     public void setCurrentStock(double currentStock) { this.currentStock = currentStock; }
@@ -35,8 +39,7 @@ public class Item {
     public void setStatus(String status) { this.status = status; }
 
     public boolean isLowStock() {
-        return ItemStatus.LOW_STOCK.name().equalsIgnoreCase(status)
-                || ItemStatus.OUT_OF_STOCK.name().equalsIgnoreCase(status);
+        return ItemStatus.OUT_OF_STOCK.name().equalsIgnoreCase(status) || currentStock <= 10;
     }
 
     public boolean isInStock() {

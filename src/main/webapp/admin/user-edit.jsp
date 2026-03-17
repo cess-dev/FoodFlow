@@ -30,7 +30,7 @@
                 <select name="role">
                     <option value="ADMIN" <%= editUser != null && editUser.getRole() == User.Role.ADMIN ? "selected" : "" %>>Admin</option>
                     <option value="DEPARTMENT_HEAD" <%= editUser != null && editUser.getRole() == User.Role.DEPARTMENT_HEAD ? "selected" : "" %>>Department Head</option>
-                    <option value="STORE_KEEPER" <%= editUser != null && editUser.getRole() == User.Role.STORE_KEEPER ? "selected" : "" %>>Store Keeper</option>
+                    <option value="STOREKEEPER" <%= editUser != null && editUser.getRole() == User.Role.STOREKEEPER ? "selected" : "" %>>Store Keeper</option>
                 </select>
             </label>
             <button type="submit">Save changes</button>

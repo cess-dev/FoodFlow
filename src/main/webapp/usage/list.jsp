@@ -44,6 +44,7 @@
                     </select>
                 </label>
                 <label>Quantity issued<input type="number" name="quantity" step="1" min="1" required></label>
+                <label>Issued to<input type="text" name="issuedTo" placeholder="Department or person"></label>
                 <button type="submit">Deduct from inventory</button>
             </form>
         </article>

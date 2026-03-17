@@ -17,7 +17,7 @@ public class DamageDAO {
 
     public boolean addDamage(Damage damage) {
         String insertSql = "INSERT INTO damage_log (item_id, quantity, damage_date, description, reported_by) VALUES (?, ?, ?, ?, ?)";
-        String stockSql = "UPDATE items SET stock = stock - ?, status = CASE WHEN stock - ? <= 0 THEN 'OUT_OF_STOCK' WHEN stock - ? <= 10 THEN 'LOW_STOCK' ELSE 'AVAILABLE' END WHERE item_id = ? AND stock >= ?";
+        String stockSql = "UPDATE items SET stock = stock - ?, status = CASE WHEN stock - ? <= 0 THEN 'OUT_OF_STOCK' ELSE 'AVAILABLE' END WHERE item_id = ? AND stock >= ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement insertStmt = conn.prepareStatement(insertSql);
              PreparedStatement stockStmt = conn.prepareStatement(stockSql)) {
@@ -26,14 +26,17 @@ public class DamageDAO {
             insertStmt.setDouble(2, damage.getQuantity());
             insertStmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.of(damage.getDate(), java.time.LocalTime.NOON)));
             insertStmt.setString(4, damage.getDescription());
-            insertStmt.setInt(5, damage.getReportedByUserId());
+            if (damage.getReportedByUserId() == null || damage.getReportedByUserId() <= 0) {
+                insertStmt.setNull(5, java.sql.Types.INTEGER);
+            } else {
+                insertStmt.setInt(5, damage.getReportedByUserId());
+            }
             insertStmt.executeUpdate();
 
             stockStmt.setDouble(1, damage.getQuantity());
             stockStmt.setDouble(2, damage.getQuantity());
-            stockStmt.setDouble(3, damage.getQuantity());
-            stockStmt.setInt(4, damage.getItemId());
-            stockStmt.setDouble(5, damage.getQuantity());
+            stockStmt.setInt(3, damage.getItemId());
+            stockStmt.setDouble(4, damage.getQuantity());
             if (stockStmt.executeUpdate() == 0) {
                 conn.rollback();
                 return false;
@@ -50,7 +53,7 @@ public class DamageDAO {
     public List<Damage> getAllDamage() {
         String sql = "SELECT d.*, i.name AS item_name, u.name AS reported_by_name " +
                 "FROM damage_log d JOIN items i ON d.item_id = i.item_id " +
-                "JOIN users u ON d.reported_by = u.user_id ORDER BY d.damage_date DESC";
+                "LEFT JOIN users u ON d.reported_by = u.user_id ORDER BY d.damage_date DESC";
         List<Damage> damages = new ArrayList<>();
         try (Connection conn = DatabaseConfig.getConnection();
              Statement stmt = conn.createStatement();
@@ -62,14 +65,6 @@ public class DamageDAO {
             e.printStackTrace();
         }
         return damages;
-    }
-
-    public boolean recordDamage(String itemId, int quantity, String reason, int userId) {
-        try {
-            return recordDamage(Integer.parseInt(itemId), quantity, reason, userId);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
     }
 
     public boolean recordDamage(int itemId, double quantity, String reason, int userId) {
@@ -92,7 +87,8 @@ public class DamageDAO {
             damage.setDate(timestamp.toLocalDateTime().toLocalDate());
         }
         damage.setDescription(rs.getString("description"));
-        damage.setReportedByUserId(rs.getInt("reported_by"));
+        int reportedBy = rs.getInt("reported_by");
+        damage.setReportedByUserId(rs.wasNull() ? null : reportedBy);
         damage.setReportedBy(rs.getString("reported_by_name"));
         return damage;
     }

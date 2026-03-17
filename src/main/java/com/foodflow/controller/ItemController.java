@@ -59,6 +59,8 @@ public class ItemController extends HttpServlet {
             Item item = new Item();
             item.setName(request.getParameter("itemName"));
             item.setCategory(request.getParameter("category"));
+            String itemType = request.getParameter("itemType");
+            item.setItemType(itemType == null || itemType.isBlank() ? "FOOD" : itemType.toUpperCase());
             item.setUnitOfMeasure(request.getParameter("unitOfMeasure"));
             item.setDescription(request.getParameter("description"));
             item.setCurrentStock(parseDouble(request.getParameter("quantity")));

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class SystemLog {
     private int logId;
-    private int userId;
+    private Integer userId;
     private String userName;
     private String action;
     private LocalDateTime timestamp;
@@ -12,8 +12,8 @@ public class SystemLog {
     public int getLogId() { return logId; }
     public void setLogId(int logId) { this.logId = logId; }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }

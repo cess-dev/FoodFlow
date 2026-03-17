@@ -1,5 +1,6 @@
 package com.foodflow.controller;
 
+import com.foodflow.dao.StoreRequestDAO;
 import com.foodflow.model.User;
 
 import jakarta.servlet.ServletException;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 @WebServlet("/dashboard")
 public class DashboardController extends HttpServlet {
+    private final StoreRequestDAO storeRequestDAO = new StoreRequestDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -24,6 +26,7 @@ public class DashboardController extends HttpServlet {
             return;
         }
 
+        request.setAttribute("pendingRequestCount", storeRequestDAO.countPendingRequests());
         User user = (User) session.getAttribute("user");
         switch (user.getRole()) {
             case ADMIN:
@@ -32,7 +35,7 @@ public class DashboardController extends HttpServlet {
             case DEPARTMENT_HEAD:
                 response.sendRedirect("department-head/dashboard.jsp");
                 break;
-            case STORE_KEEPER:
+            case STOREKEEPER:
                 response.sendRedirect("storekeeper/dashboard.jsp");
                 break;
             default:

@@ -2,6 +2,7 @@ package com.foodflow.controller;
 
 import com.foodflow.dao.UserDAO;
 import com.foodflow.model.User;
+import com.foodflow.service.UserService;
 import com.foodflow.util.PasswordUtil;
 
 import jakarta.servlet.ServletException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class UserController extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
+    private final UserService userService = new UserService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -84,9 +86,9 @@ public class UserController extends HttpServlet {
             newUser.setFullName(request.getParameter("fullName"));
             newUser.setUsername(request.getParameter("fullName"));
             newUser.setEmail(request.getParameter("email"));
-            newUser.setPassword(PasswordUtil.hashPassword(request.getParameter("password")));
+            newUser.setPassword(request.getParameter("password"));
             newUser.setRole(User.Role.valueOf(request.getParameter("role").toUpperCase()));
-            userDAO.addUser(newUser);
+            userService.addUser(newUser);
             response.sendRedirect("users");
             return;
         }

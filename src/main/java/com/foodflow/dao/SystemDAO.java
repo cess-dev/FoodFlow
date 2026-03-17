@@ -15,7 +15,7 @@ import java.util.List;
 public class SystemDAO {
 
     public List<SystemLog> getRecentLogs() {
-        String sql = "SELECT l.*, u.name AS user_name FROM system_logs l JOIN users u ON l.user_id = u.user_id ORDER BY l.timestamp DESC";
+        String sql = "SELECT l.*, u.name AS user_name FROM system_logs l LEFT JOIN users u ON l.user_id = u.user_id ORDER BY l.timestamp DESC";
         List<SystemLog> logs = new ArrayList<>();
         try (Connection conn = DatabaseConfig.getConnection();
              Statement stmt = conn.createStatement();
@@ -23,7 +23,8 @@ public class SystemDAO {
             while (rs.next()) {
                 SystemLog log = new SystemLog();
                 log.setLogId(rs.getInt("log_id"));
-                log.setUserId(rs.getInt("user_id"));
+                int userId = rs.getInt("user_id");
+                log.setUserId(rs.wasNull() ? null : userId);
                 log.setUserName(rs.getString("user_name"));
                 log.setAction(rs.getString("action_performed"));
                 Timestamp timestamp = rs.getTimestamp("timestamp");

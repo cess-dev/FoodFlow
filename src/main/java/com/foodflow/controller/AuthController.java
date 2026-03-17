@@ -62,12 +62,6 @@ public class AuthController extends HttpServlet {
                 return;
             }
 
-            if (user.isAccountLocked()) {
-                request.setAttribute("error", "Account is locked.");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
-                return;
-            }
-
             // Successful login
             HttpSession session = request.getSession();
             session.setAttribute("user", user);

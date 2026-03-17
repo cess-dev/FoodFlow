@@ -13,8 +13,9 @@ public class Usage {
     private int itemId;
     private String itemName;
     private double quantity;
+    private String issuedTo;
     private String itemUserName;
-    private int recordedBy;
+    private Integer recordedBy;
     private double quantityReturned;
     private LocalDate date = LocalDate.now();
     private Status status = Status.ISSUED;
@@ -31,11 +32,14 @@ public class Usage {
     public double getQuantity() { return quantity; }
     public void setQuantity(double quantity) { this.quantity = quantity; }
 
+    public String getIssuedTo() { return issuedTo; }
+    public void setIssuedTo(String issuedTo) { this.issuedTo = issuedTo; }
+
     public String getItemUserName() { return itemUserName; }
     public void setItemUserName(String itemUserName) { this.itemUserName = itemUserName; }
 
-    public int getRecordedBy() { return recordedBy; }
-    public void setRecordedBy(int recordedBy) { this.recordedBy = recordedBy; }
+    public Integer getRecordedBy() { return recordedBy; }
+    public void setRecordedBy(Integer recordedBy) { this.recordedBy = recordedBy; }
 
     public double getQuantityReturned() { return quantityReturned; }
     public void setQuantityReturned(double quantityReturned) { this.quantityReturned = quantityReturned; }

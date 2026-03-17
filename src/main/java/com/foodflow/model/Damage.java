@@ -10,7 +10,7 @@ public class Damage {
     private LocalDate date = LocalDate.now();
     private String description;
     private String reportedBy;
-    private int reportedByUserId;
+    private Integer reportedByUserId;
 
     public int getDamageId() { return damageId; }
     public void setDamageId(int damageId) { this.damageId = damageId; }
@@ -33,6 +33,6 @@ public class Damage {
     public String getReportedBy() { return reportedBy; }
     public void setReportedBy(String reportedBy) { this.reportedBy = reportedBy; }
 
-    public int getReportedByUserId() { return reportedByUserId; }
-    public void setReportedByUserId(int reportedByUserId) { this.reportedByUserId = reportedByUserId; }
+    public Integer getReportedByUserId() { return reportedByUserId; }
+    public void setReportedByUserId(Integer reportedByUserId) { this.reportedByUserId = reportedByUserId; }
 }

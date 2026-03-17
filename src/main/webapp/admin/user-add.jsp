@@ -25,7 +25,7 @@
                 <select name="role">
                     <option value="ADMIN">Admin</option>
                     <option value="DEPARTMENT_HEAD">Department Head</option>
-                    <option value="STORE_KEEPER">Store Keeper</option>
+                    <option value="STOREKEEPER">Store Keeper</option>
                 </select>
             </label>
             <button type="submit">Create user</button>

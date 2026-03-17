@@ -45,6 +45,7 @@
                 <tr>
                     <th>Item</th>
                     <th>Category</th>
+                    <th>Type</th>
                     <th>Stock</th>
                     <th>Unit</th>
                     <th>Status</th>
@@ -56,13 +57,14 @@
                     <tr>
                         <td><%= item.getName() %></td>
                         <td><%= item.getCategory() %></td>
+                        <td><%= item.getItemType() %></td>
                         <td><%= item.getCurrentStock() %></td>
                         <td><%= item.getUnitOfMeasure() %></td>
                         <td class="<%= item.isLowStock() ? "status-low" : "status-ok" %>"><%= item.getStatus() %></td>
                     </tr>
                     <% } %>
                 <% } else { %>
-                    <tr><td colspan="5">No items found.</td></tr>
+                    <tr><td colspan="6">No items found.</td></tr>
                 <% } %>
                 </tbody>
             </table>
@@ -75,6 +77,14 @@
                 <input type="hidden" name="action" value="add">
                 <label>Item name<input type="text" name="itemName" required></label>
                 <label>Category<input type="text" name="category" placeholder="Food, Utensils, Cleaning" required></label>
+                <label>
+                    Item type
+                    <select name="itemType" required>
+                        <option value="FOOD">Food</option>
+                        <option value="UTENSIL">Utensil</option>
+                        <option value="TOOL">Tool</option>
+                    </select>
+                </label>
                 <label>Opening stock<input type="number" name="quantity" step="0.01" required></label>
                 <label>Unit of measure<input type="text" name="unitOfMeasure" placeholder="kg, pcs, liters" required></label>
                 <label>Description<textarea name="description" placeholder="Optional item description"></textarea></label>
