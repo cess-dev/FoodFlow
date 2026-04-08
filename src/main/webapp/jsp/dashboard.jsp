@@ -2,51 +2,38 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%
-  // ---- Simulate server-side data retrieval ----
-  // In production, inject via:
-  //   InventoryService svc = (InventoryService) request.getAttribute("inventoryService");
-  //   List<Item> items = svc.getAllItems();
-  // For this demo, we simulate with static values.
-
+  // Get real data from controller
+  com.foodflow.model.User user = (com.foodflow.model.User) request.getAttribute("user");
+  com.foodflow.model.User.Role role = (com.foodflow.model.User.Role) request.getAttribute("role");
+  java.util.List<com.foodflow.model.Item> items = (java.util.List<com.foodflow.model.Item>) request.getAttribute("items");
+  java.util.List<com.foodflow.model.Damage> damages = (java.util.List<com.foodflow.model.Damage>) request.getAttribute("damages");
+  Integer pendingRequestCount = (Integer) request.getAttribute("pendingRequestCount");
+  
+  // Calculate statistics from real data
   java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("EEE, dd MMM yyyy");
   String serverDate = dateFormat.format(new java.util.Date());
-
-  // Simulated stats from DB
-  int totalItems      = 18;
-  int inStockCount    = 12;
-  int damagedCount    = 6;
-  int staffCheckouts  = 7;
-  int lowStockCount   = 4;
-  int outOfStockCount = 2;
-
-  // Session / auth check (production)
-  // HttpSession sess = request.getSession(false);
-  // if (sess == null || sess.getAttribute("loggedInUser") == null) {
-  //   response.sendRedirect("login.jsp");
-  //   return;
-  // }
-  // String username = (String) sess.getAttribute("loggedInUser");
-  String username = "Admin User";
-  String userRole = "Store Manager";
-
-  // Low stock items (simulated — from DB in production)
-  String[][] lowStockItems = {
-    {"Eggs",              "18",  "24",  "Low Stock"},
-    {"Orange Juice",      "7",   "10",  "Low Stock"},
-    {"Rice (25kg bag)",   "12",  "15",  "Low Stock"},
-    {"Bleach Disinfectant","8",  "15",  "Low Stock"},
-    {"Butter",            "0",   "5",   "Out of Stock"},
-    {"Dishwashing Liquid","0",   "20",  "Out of Stock"},
-  };
-
-  // Recent activity (simulated)
-  String[][] activities = {
-    {"add",      "Added <strong>Fresh Milk (120L)</strong> to inventory",     "2 hours ago"},
-    {"damage",   "Damage reported: <strong>Eggs (×24)</strong> broken",       "5 hours ago"},
-    {"checkout", "<strong>James Otieno</strong> checked out Cooking Oil",     "Yesterday"},
-    {"add",      "Added <strong>Bleach Disinfectant (×8)</strong>",           "2 days ago"},
-    {"damage",   "<strong>Dishwashing Liquid</strong> written off",           "5 days ago"},
-  };
+  
+  int totalItems = (items != null) ? items.size() : 0;
+  int inStockCount = 0;
+  int outOfStockCount = 0;
+  int lowStockCount = 0;
+  int damagedCount = (damages != null) ? damages.size() : 0;
+  
+  if (items != null) {
+    for (com.foodflow.model.Item item : items) {
+      if (item.getCurrentStock() > 0) {
+        inStockCount++;
+      } else {
+        outOfStockCount++;
+      }
+      if (item.isLowStock()) {
+        lowStockCount++;
+      }
+    }
+  }
+  
+  String username = (user != null) ? user.getFullName() : "Unknown";
+  String userRole = (role != null) ? role.toString() : "Unknown";
   
   // Set attributes for EL access
   request.setAttribute("serverDate", serverDate);
@@ -55,11 +42,9 @@
   request.setAttribute("totalItems", totalItems);
   request.setAttribute("inStockCount", inStockCount);
   request.setAttribute("damagedCount", damagedCount);
-  request.setAttribute("staffCheckouts", staffCheckouts);
   request.setAttribute("lowStockCount", lowStockCount);
   request.setAttribute("outOfStockCount", outOfStockCount);
-  request.setAttribute("lowStockItems", lowStockItems);
-  request.setAttribute("activities", activities);
+  request.setAttribute("pendingRequestCount", pendingRequestCount != null ? pendingRequestCount : 0);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -81,12 +66,11 @@
     <!-- Top bar (server rendered) -->
     <header class="topbar">
       <div class="topbar-left">
-        <h2 class="page-title">Server-Side Dashboard</h2>
+        <h2 class="page-title">FoodFlow Dashboard</h2>
         <div class="breadcrumb-wrap">
-          <span class="bc-item">INVENTORY management
-          </span>
+          <span class="bc-item">INVENTORY MANAGEMENT</span>
           <i class="fa-solid fa-chevron-right bc-sep"></i>
-          <span class="bc-item active">Dashboard (JSP)</span>
+          <span class="bc-item active">Dashboard</span>
         </div>
       </div>
       <div class="topbar-right">
@@ -98,8 +82,8 @@
           <i class="fa-solid fa-user-tie"></i>
           <span>${username} — ${userRole}</span>
         </div>
-        <a href="index.html" class="btn-primary-action" style="text-decoration:none;">
-          <i class="fa-solid fa-arrow-left"></i> Back to App
+        <a href="${pageContext.request.contextPath}/auth?action=logout" class="btn-primary-action" style="text-decoration:none;">
+          <i class="fa-solid fa-sign-out-alt"></i> Logout
         </a>
       </div>
     </header>
@@ -155,13 +139,13 @@
         </div>
         <div class="col-xl-3 col-md-6">
           <div class="stat-card shake-card" data-color="amber">
-            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-icon"><i class="fa-solid fa-clipboard-list"></i></div>
             <div class="stat-info">
-              <span class="stat-label">Staff Checkouts</span>
-              <span class="stat-value">${staffCheckouts}</span>
-              <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> This month</span>
+              <span class="stat-label">Pending Requests</span>
+              <span class="stat-value">${pendingRequestCount}</span>
+              <span class="stat-trend up"><i class="fa-solid fa-arrow-trend-up"></i> Awaiting approval</span>
             </div>
-            <div class="stat-bg-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-bg-icon"><i class="fa-solid fa-clipboard-list"></i></div>
           </div>
         </div>
       </div>
@@ -180,20 +164,27 @@
                   <tr>
                     <th>Item Name</th>
                     <th>Current Qty</th>
-                    <th>Min Level</th>
+                    <th>Unit</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <c:forEach var="item" items="${lowStockItems}">
-                    <c:set var="statusClass" value="${item[3] eq 'Out of Stock' ? 'red' : 'amber'}" />
-                    <tr>
-                      <td><strong>${item[0]}</strong></td>
-                      <td style="font-family:'JetBrains Mono',monospace">${item[1]}</td>
-                      <td style="font-family:'JetBrains Mono',monospace;color:var(--text-muted)">${item[2]}</td>
-                      <td><span class="badge badge-${statusClass}">${item[3]}</span></td>
-                    </tr>
+                  <c:forEach var="item" items="${items}">
+                    <c:if test="${item.lowStock}">
+                      <c:set var="statusClass" value="${item.status eq 'OUT_OF_STOCK' ? 'red' : 'amber'}" />
+                      <tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td style="font-family:'JetBrains Mono',monospace">${item.currentStock}</td>
+                        <td style="font-family:'JetBrains Mono',monospace;color:var(--text-muted)">${item.unitOfMeasure}</td>
+                        <td><span class="badge badge-${statusClass}">${item.status}</span></td>
+                      </tr>
+                    </c:if>
                   </c:forEach>
+                  <c:if test="${lowStockCount == 0}">
+                    <tr>
+                      <td colspan="4" style="text-align:center;color:var(--text-muted)">No low stock items</td>
+                    </tr>
+                  </c:if>
                 </tbody>
               </table>
             </div>
@@ -204,25 +195,26 @@
         <div class="col-xl-5">
           <div class="card-panel shake-card">
             <div class="panel-header">
-              <h5><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h5>
+              <h5><i class="fa-solid fa-clock-rotate-left"></i> Recent Damage Reports</h5>
             </div>
             <div class="activity-list">
-              <c:forEach var="activity" items="${activities}">
-                <c:set var="iconClass" value="fa-plus" />
-                <c:if test="${activity[0] eq 'damage'}">
-                  <c:set var="iconClass" value="fa-triangle-exclamation" />
-                </c:if>
-                <c:if test="${activity[0] eq 'checkout'}">
-                  <c:set var="iconClass" value="fa-user-check" />
-                </c:if>
+              <c:forEach var="damage" items="${damages}" end="4">
                 <div class="activity-item">
-                  <div class="activity-icon ${activity[0]}">
-                    <i class="fa-solid ${iconClass}"></i>
+                  <div class="activity-icon damage">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                   </div>
-                  <div class="activity-text">${activity[1]}</div>
-                  <div class="activity-time">${activity[2]}</div>
+                  <div class="activity-text">
+                    Damage: <strong>${damage.itemName}</strong> (${damage.quantity} units)
+                  </div>
+                  <div class="activity-time">${damage.reportDate}</div>
                 </div>
               </c:forEach>
+              <c:if test="${damagedCount == 0}">
+                <div style="text-align:center;color:var(--text-muted);padding:20px;">
+                  <i class="fa-solid fa-check-circle" style="font-size:32px;margin-bottom:10px;display:block;"></i>
+                  No damage reports
+                </div>
+              </c:if>
             </div>
           </div>
         </div>

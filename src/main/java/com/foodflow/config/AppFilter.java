@@ -9,11 +9,29 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
 @WebFilter("/*")
 public class AppFilter implements Filter {
+
+    // Pages that don't require authentication
+    private static final String[] PUBLIC_PAGES = {
+        "/login.jsp",
+        "/signup.jsp",
+        "/auth",
+        "/home.jsp",
+        "/index.html",
+        "/test-db.jsp",
+        "/simple-db-test.jsp",
+        "/test-api.html",
+        "/test-servlets.html",
+        "/css/",
+        "/js/",
+        "/images/",
+        "/api/"
+    };
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -28,9 +46,47 @@ public class AppFilter implements Filter {
 
         WebConfig.configureRequest(request);
         WebConfig.configureResponse(response);
+        
+        String requestURI = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String path = requestURI.substring(contextPath.length());
+
+        // Redirect root path to login page
+        if (path.equals("/") || path.isEmpty()) {
+            response.sendRedirect(contextPath + "/login.jsp");
+            return;
+        }
+
+        // Check if the requested page is public
+        if (!isPublicPage(path)) {
+            // Check if user is authenticated
+            HttpSession session = request.getSession(false);
+            boolean isLoggedIn = (session != null && session.getAttribute("user") != null);
+
+            if (!isLoggedIn) {
+                // User is not authenticated, redirect to login
+                response.sendRedirect(contextPath + "/login.jsp");
+                return;
+            }
+        }
+        
         request.getSession().setMaxInactiveInterval(WebConfig.SESSION_TIMEOUT_MINUTES * 60);
 
         chain.doFilter(servletRequest, servletResponse);
+    }
+
+    /**
+     * Check if the requested page is publicly accessible
+     */
+    private boolean isPublicPage(String path) {
+        // Exact match
+        for (String publicPage : PUBLIC_PAGES) {
+            if (path.equals(publicPage) || path.startsWith(publicPage)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

@@ -1100,8 +1100,8 @@ body.light-mode .search-wrap input::placeholder { color: #94a3b8; }
       <div class="user-badge">
         <div class="avatar"><i class="fa-solid fa-user-tie"></i></div>
         <div>
-          <div class="user-name">User</div>
-          <div class="user-role">Store Manager</div>
+          <div class="user-name" id="sidebarUserName">User</div>
+          <div class="user-role" id="sidebarUserRole">Store Manager</div>
         </div>
       </div>
     </div>
@@ -1132,6 +1132,13 @@ body.light-mode .search-wrap input::placeholder { color: #94a3b8; }
           <i class="fa-regular fa-calendar"></i>
           <span id="currentDate"></span>
         </div>
+        <div class="date-badge" id="userBadge" style="cursor:pointer;">
+          <i class="fa-solid fa-user-circle"></i>
+          <span id="topbarUserName">Loading...</span>
+        </div>
+        <a href="auth?action=logout" class="icon-btn" title="Logout" style="text-decoration:none;">
+          <i class="fa-solid fa-sign-out-alt"></i>
+        </a>
       </div>
     </header>
 
