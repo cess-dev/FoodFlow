@@ -18,19 +18,13 @@ public class AppFilter implements Filter {
 
     // Pages that don't require authentication
     private static final String[] PUBLIC_PAGES = {
+        "/landing.jsp",
         "/login.jsp",
-        "/signup.jsp",
         "/auth",
-        "/home.jsp",
-        "/index.html",
-        "/test-db.jsp",
-        "/simple-db-test.jsp",
-        "/test-api.html",
-        "/test-servlets.html",
         "/css/",
         "/js/",
         "/images/",
-        "/api/"
+        "/favicon.ico"
     };
 
     @Override
@@ -51,9 +45,9 @@ public class AppFilter implements Filter {
         String contextPath = request.getContextPath();
         String path = requestURI.substring(contextPath.length());
 
-        // Redirect root path to login page
+        // Redirect root path to landing page
         if (path.equals("/") || path.isEmpty()) {
-            response.sendRedirect(contextPath + "/login.jsp");
+            response.sendRedirect(contextPath + "/landing.jsp");
             return;
         }
 
@@ -70,7 +64,10 @@ public class AppFilter implements Filter {
             }
         }
         
-        request.getSession().setMaxInactiveInterval(WebConfig.SESSION_TIMEOUT_MINUTES * 60);
+        HttpSession activeSession = request.getSession(false);
+        if (activeSession != null) {
+            activeSession.setMaxInactiveInterval(WebConfig.SESSION_TIMEOUT_MINUTES * 60);
+        }
 
         chain.doFilter(servletRequest, servletResponse);
     }

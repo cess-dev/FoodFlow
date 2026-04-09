@@ -4,9 +4,9 @@
    xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
    version="6.0">
     
-    <!-- Welcome File - Login Page First -->
+    <!-- Welcome File - Landing Page First -->
     <welcome-file-list>
-        <welcome-file>login.jsp</welcome-file>
+        <welcome-file>landing.jsp</welcome-file>
     </welcome-file-list>
     
     <!-- Session Configuration -->

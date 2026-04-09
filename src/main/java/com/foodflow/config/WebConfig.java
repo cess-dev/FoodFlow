@@ -24,7 +24,8 @@ public class WebConfig {
      */
     public static void configureResponse(HttpServletResponse response) {
         response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
+        // Do not force a global content type in the filter; static assets
+        // (CSS/JS/images) and API endpoints need their own MIME types.
     }
 
     /**

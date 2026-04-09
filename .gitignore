@@ -18,8 +18,3 @@ Thumbs.db
 
 # Environment / configs
 .env
-
-# Optional: ignore markdown clutter
-*.md
-!README.md
-!DATABASE_SETUP_GUIDE.md

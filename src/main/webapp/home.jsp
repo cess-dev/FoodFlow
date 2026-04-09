@@ -27,7 +27,7 @@
         sessionStorage.setItem('userId', uId);
         
         // Redirect to main application
-        window.location.href = 'index.html';
+        window.location.href = '<%= request.getContextPath() %>/index.html?v=20260409';
     </script>
 </head>
 <body>

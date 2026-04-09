@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Root redirect servlet - Redirects root path to login page
+ * Root redirect servlet - Redirects root path to landing page
  */
 @WebServlet("")
 public class RootRedirectServlet extends HttpServlet {
@@ -17,8 +17,8 @@ public class RootRedirectServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Always redirect root to login page
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        // Always redirect root to landing page
+        response.sendRedirect(request.getContextPath() + "/landing.jsp");
     }
 
     @Override

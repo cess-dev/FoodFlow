@@ -243,7 +243,7 @@
               <div class="col-md-4">
                 <div style="padding:14px;background:var(--navy-800);border-radius:var(--radius-sm);border:1px solid var(--border-color)">
                   <div style="color:var(--accent-green);font-weight:700;margin-bottom:8px;font-size:12px;letter-spacing:1px;text-transform:uppercase">API Endpoint</div>
-                  <code style="color:var(--accent-cyan)">inventoryApi.jsp</code> handles all JSON REST calls. Frontend JS calls this endpoint for live CRUD operations in production.
+                  <code style="color:var(--accent-cyan)">/api/items</code>, <code style="color:var(--accent-cyan)">/api/damage</code>, <code style="color:var(--accent-cyan)">/api/usage</code>, and <code style="color:var(--accent-cyan)">/api/dashboard</code> handle JSON requests for live frontend operations.
                 </div>
               </div>
             </div>
