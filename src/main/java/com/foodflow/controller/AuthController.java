@@ -2,6 +2,7 @@ package com.foodflow.controller;
 
 import com.foodflow.dao.UserDAO;
 import com.foodflow.model.User;
+import com.foodflow.model.UserSessionBean;
 import com.foodflow.util.PasswordUtil;
 
 import jakarta.servlet.ServletException;
@@ -73,6 +74,12 @@ public class AuthController extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
             session.setAttribute("role", user.getRole());
+            UserSessionBean userSession = new UserSessionBean();
+            userSession.setUserId(user.getUserId());
+            userSession.setFullName(user.getFullName());
+            userSession.setRole(user.getRole().name());
+            userSession.setAuthenticatedAt(java.time.LocalDateTime.now());
+            session.setAttribute("userSession", userSession);
             session.setMaxInactiveInterval(30 * 60); // 30 mins
 
             userDAO.resetLoginAttempts(user.getUserId());

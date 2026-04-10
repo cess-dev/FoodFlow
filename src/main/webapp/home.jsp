@@ -1,16 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%
-    // Check if user is logged in
-    if (session.getAttribute("user") == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-    
-    com.foodflow.model.User user = (com.foodflow.model.User) session.getAttribute("user");
-    String userName = user.getFullName();
-    String userRole = user.getRole().toString();
-    int userId = user.getUserId();
-%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:if test="${empty sessionScope.user}">
+    <c:redirect url="/login.jsp" />
+</c:if>
+<jsp:useBean id="userSession" class="com.foodflow.model.UserSessionBean" scope="session" />
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,15 +12,15 @@
     <title>FoodFlow — Redirecting...</title>
     <script>
         // Store user info in sessionStorage
-        var uName = "<%= userName %>";
-        var uRole = "<%= userRole %>";
-        var uId = "<%= userId %>";
+        var uName = "${not empty userSession.authenticatedAt ? userSession.fullName : sessionScope.user.fullName}";
+        var uRole = "${not empty userSession.authenticatedAt ? userSession.role : sessionScope.user.role}";
+        var uId = "${not empty userSession.authenticatedAt ? userSession.userId : sessionScope.user.userId}";
         sessionStorage.setItem('userName', uName);
         sessionStorage.setItem('userRole', uRole);
         sessionStorage.setItem('userId', uId);
         
         // Redirect to main application
-        window.location.href = '<%= request.getContextPath() %>/index.html?v=20260409';
+        window.location.href = '${pageContext.request.contextPath}/index.html?v=20260409';
     </script>
 </head>
 <body>
